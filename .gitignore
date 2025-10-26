@@ -404,3 +404,6 @@ FodyWeavers.xsd
 # Augment AI rules
 .augment/rules/
 
+# Documentación local (no subir al repositorio)
+docs/
+

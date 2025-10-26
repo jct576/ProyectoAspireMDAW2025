@@ -1,0 +1,6 @@
+@ProyectoAspireMDAW2025.Auth.Api_HostAddress = http://localhost:5136
+
+GET {{ProyectoAspireMDAW2025.Auth.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
