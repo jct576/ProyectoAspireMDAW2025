@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAspireMDAW2025.Auth.Domain.Entities;
+using ProyectoAspireMDAW2025.Auth.Infrastructure.Data.Seeds;
 
 namespace ProyectoAspireMDAW2025.Auth.Infrastructure.Data;
 
@@ -61,6 +62,16 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,
         {
             entity.ToTable("UserTokens");
         });
+
+        // ==================== SEED DATA ====================
+        // Seed Permissions (18 permisos)
+        PermissionsSeed.Seed(builder);
+
+        // Seed Roles (4 roles: Admin, Manager, User, Guest)
+        RolesSeed.Seed(builder);
+
+        // Seed RolePermissions (31 asignaciones)
+        RolePermissionsSeed.Seed(builder);
     }
 }
 

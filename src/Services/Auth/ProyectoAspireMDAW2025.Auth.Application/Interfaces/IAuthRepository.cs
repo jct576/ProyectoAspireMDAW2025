@@ -51,5 +51,69 @@ public interface IAuthRepository
     /// Obtiene todos los refresh tokens activos de un usuario
     /// </summary>
     Task<IList<RefreshToken>> GetUserActiveRefreshTokensAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    // ==================== ROLE MANAGEMENT ====================
+
+    /// <summary>
+    /// Asigna un rol a un usuario
+    /// </summary>
+    Task<bool> AssignRoleToUserAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Remueve un rol de un usuario
+    /// </summary>
+    Task<bool> RemoveRoleFromUserAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Verifica si un rol existe
+    /// </summary>
+    Task<bool> RoleExistsAsync(string roleName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Crea un nuevo rol
+    /// </summary>
+    Task<ApplicationRole> CreateRoleAsync(string roleName, string? description = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene un rol por nombre
+    /// </summary>
+    Task<ApplicationRole?> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene todos los roles
+    /// </summary>
+    Task<IList<ApplicationRole>> GetAllRolesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Verifica si un usuario tiene un rol específico
+    /// </summary>
+    Task<bool> IsInRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken = default);
+
+    // ==================== PERMISSION MANAGEMENT ====================
+
+    /// <summary>
+    /// Obtiene todos los permisos del sistema
+    /// </summary>
+    Task<IList<Permission>> GetAllPermissionsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene los permisos de un rol específico
+    /// </summary>
+    Task<IList<Permission>> GetRolePermissionsAsync(Guid roleId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene los permisos de un rol por nombre
+    /// </summary>
+    Task<IList<Permission>> GetRolePermissionsByNameAsync(string roleName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene todos los permisos efectivos de un usuario (combinación de todos sus roles)
+    /// </summary>
+    Task<IList<string>> GetUserPermissionsAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene un permiso por nombre
+    /// </summary>
+    Task<Permission?> GetPermissionByNameAsync(string permissionName, CancellationToken cancellationToken = default);
 }
 

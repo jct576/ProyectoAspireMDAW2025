@@ -56,6 +56,9 @@ builder.Services.AddApplicationServices();
 // Infrastructure Layer (DbContext, Identity, JWT, Repositories, MassTransit)
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
+// Authorization basada en permisos
+ProyectoAspireMDAW2025.Auth.Api.Extensions.AuthorizationExtensions.AddPermissionAuthorization(builder.Services);
+
 // CORS (opcional, para desarrollo)
 builder.Services.AddCors(options =>
 {

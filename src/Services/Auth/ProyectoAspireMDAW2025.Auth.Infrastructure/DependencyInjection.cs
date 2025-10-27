@@ -95,6 +95,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthRepository, AuthRepository>();
 
         // Services
+        services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<ITokenService, TokenService>();
 
         // MassTransit con RabbitMQ

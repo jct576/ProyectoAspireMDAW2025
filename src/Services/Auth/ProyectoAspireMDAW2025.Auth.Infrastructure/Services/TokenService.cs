@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using ProyectoAspireMDAW2025.Auth.Application.Interfaces;
 using ProyectoAspireMDAW2025.Auth.Domain.Entities;
 using ProyectoAspireMDAW2025.Auth.Infrastructure.Data;
+using ProyectoAspireMDAW2025.Common.Constants;
 
 namespace ProyectoAspireMDAW2025.Auth.Infrastructure.Services;
 
@@ -21,17 +23,20 @@ public class TokenService : ITokenService
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly AuthDbContext _context;
+    private readonly IPermissionService _permissionService;
     private readonly ILogger<TokenService> _logger;
 
     public TokenService(
         IConfiguration configuration,
         UserManager<ApplicationUser> userManager,
         AuthDbContext context,
+        IPermissionService permissionService,
         ILogger<TokenService> logger)
     {
         _configuration = configuration;
         _userManager = userManager;
         _context = context;
+        _permissionService = permissionService;
         _logger = logger;
     }
 
@@ -42,6 +47,9 @@ public class TokenService : ITokenService
             // Obtener roles del usuario
             var roles = await _userManager.GetRolesAsync(user);
 
+            // Obtener permisos del usuario
+            var permissions = await _permissionService.GetUserPermissionsAsync(user.Id, cancellationToken);
+
             // Crear claims
             var claims = new List<Claim>
             {
@@ -51,13 +59,30 @@ public class TokenService : ITokenService
                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             };
 
+            // Agregar username si existe
+            if (!string.IsNullOrEmpty(user.UserName))
+            {
+                claims.Add(new Claim(CustomClaimTypes.Username, user.UserName));
+            }
+
+            // Agregar UserId como custom claim
+            claims.Add(new Claim(CustomClaimTypes.UserId, user.Id.ToString()));
+
             // Agregar roles como claims
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            // TODO: En Phase 3B agregar permissions como claims
+            // Agregar permisos como claim JSON array
+            if (permissions.Any())
+            {
+                var permissionsJson = JsonSerializer.Serialize(permissions);
+                claims.Add(new Claim(CustomClaimTypes.Permissions, permissionsJson));
+
+                _logger.LogInformation("Added {PermissionCount} permissions to JWT for user {UserId}",
+                    permissions.Count, user.Id);
+            }
 
             // Configuración JWT
             var jwtSecret = _configuration["Jwt:Secret"] ?? throw new InvalidOperationException("JWT Secret not configured");
